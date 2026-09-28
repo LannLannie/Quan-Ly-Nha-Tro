@@ -507,6 +507,7 @@ td input:disabled{opacity:.45;cursor:not-allowed;background:var(--bg4)}
         <th style="color:#f85149">-Hoàn Cọc</th>
         <th style="color:#60a5fa">+Thu Hồi CN</th>
         <th style="color:#f85149">-Trả Cọc CN</th>
+        <th style="color:#eab308">+Vay Về</th>
         <th style="color:#f85149">-Chi Phí</th>
         <th style="color:#f97316">-Trả Nợ</th>
         <th style="color:#f85149">-Chi P.Bổ</th>
@@ -557,7 +558,9 @@ td input:disabled{opacity:.45;cursor:not-allowed;background:var(--bg4)}
         <th style="color:#f85149">-Hoàn Cọc</th>
         <th style="color:#60a5fa">+Thu Hồi CN</th>
         <th style="color:#f85149">-Trả Cọc CN</th>
+        <th style="color:#eab308">+Vay Về</th>
         <th style="color:#f85149">-Chi Phí</th>
+        <th style="color:#f97316">-Trả Nợ</th>
         <th style="color:#f85149">-P.Bổ/tháng</th>
         <th style="color:#f59e0b;font-weight:800">Dòng Tiền</th>
         <th style="color:#2f81f7;font-weight:800">Số Dư</th>
@@ -621,7 +624,7 @@ td input:disabled{opacity:.45;cursor:not-allowed;background:var(--bg4)}
       </div>
       <div class="pc" style="margin-top:11px">
         <h3>💸 Tổng Chi</h3>
-        <div class="pr"><span class="l">Chi phí thường</span><span class="v" id="p-chi">0đ</span></div>
+        <div class="pr"><span class="l">Chi phí thường <span style="font-size:9px;color:var(--text3);font-weight:400">(không gồm Trả Nợ Vay)</span></span><span class="v" id="p-chi">0đ</span></div>
         <div class="pr"><span class="l">Chi phí phân bổ tháng này</span><span class="v" style="color:var(--blue)" id="p-alloc">0đ</span></div>
         <div class="pr" style="font-weight:800"><span class="l" style="color:var(--text)">TỔNG CHI</span><span class="v" style="color:var(--red)" id="p-tchi">0đ</span></div>
       </div>
@@ -729,7 +732,8 @@ td input:disabled{opacity:.45;cursor:not-allowed;background:var(--bg4)}
         <div class="fsec">📋 Thông Tin Phòng</div>
         <div class="fg"><label class="fl">Thuộc Nhà *</label><select class="fi" id="rHouse"></select></div>
         <div class="fg"><label class="fl">Tên Phòng *</label><input class="fi" id="rRoom" placeholder="P101"></div>
-        <div class="fg"><label class="fl">Số Người</label><input class="fi" type="number" id="rNguoi" value="1" min="1"></div>
+        <div class="fg"><label class="fl">Số Người</label><input class="fi" type="number" id="rNguoi" value="1" min="1" onchange="onRNguoiChange()"></div>
+        <div class="fg" id="rNguoiFromWrap" style="display:none"><label class="fl">Áp dụng <span id="rNguoiFromLbl"></span> từ ngày</label><input class="fi" type="date" id="rNguoiFrom"></div>
         <div class="fg"><label class="fl">Tiền Phòng (đ)</label><input class="fi" type="number" id="rGia" value="3500000"></div>
         <div class="fg"><label class="fl">Ngày Vào Ở</label><input class="fi" type="date" id="rVaoo"></div>
         <div class="fg"><label class="fl">Ngày Ký HĐ</label><input class="fi" type="date" id="rHdky"></div>
@@ -745,14 +749,20 @@ td input:disabled{opacity:.45;cursor:not-allowed;background:var(--bg4)}
         <div class="fg"><label class="fl">Biển Số Xe</label><input class="fi" id="rBsx" placeholder="51A-12345"></div>
         <div class="fg full"><label class="fl">Địa Chỉ Thường Trú</label><input class="fi" id="rDc"></div>
         <div class="fsec">👥 Người Ở Cùng</div>
-        <div class="fg"><label class="fl">Họ Tên (người 2)</label><input class="fi" id="rTen2"></div>
+        <div class="fg"><label class="fl">Họ Tên (người 2)</label><input class="fi" id="rTen2" onchange="syncNguoiFromPersons('ten2')"></div>
         <div class="fg"><label class="fl">CCCD (người 2)</label><input class="fi" id="rCccd2"></div>
         <div class="fg"><label class="fl">SĐT (người 2)</label><input class="fi" id="rSdt2"></div>
         <div class="fg"><label class="fl">Quan Hệ</label><input class="fi" id="rQh2" placeholder="Vợ/chồng..."></div>
         <div class="fg"><label class="fl">BSX (người 2)</label><input class="fi" id="rBsx2"></div>
-        <div class="fg"><label class="fl">Họ Tên (người 3)</label><input class="fi" id="rTen3"></div>
+        <div class="fg"><label class="fl">Ngày Vào Ở (người 2)</label><input class="fi" type="date" id="rVaoo2" onchange="syncNguoiFromPersons('vaoo2')"></div>
+        <div class="fg"><label class="fl">Họ Tên (người 3)</label><input class="fi" id="rTen3" onchange="syncNguoiFromPersons('ten3')"></div>
         <div class="fg"><label class="fl">CCCD (người 3)</label><input class="fi" id="rCccd3"></div>
         <div class="fg"><label class="fl">BSX (người 3)</label><input class="fi" id="rBsx3"></div>
+        <div class="fg"><label class="fl">Ngày Vào Ở (người 3)</label><input class="fi" type="date" id="rVaoo3" onchange="syncNguoiFromPersons('vaoo3')"></div>
+        <div class="fg"><label class="fl">Họ Tên (người 4)</label><input class="fi" id="rTen4" onchange="syncNguoiFromPersons('ten4')"></div>
+        <div class="fg"><label class="fl">CCCD (người 4)</label><input class="fi" id="rCccd4"></div>
+        <div class="fg"><label class="fl">BSX (người 4)</label><input class="fi" id="rBsx4"></div>
+        <div class="fg"><label class="fl">Ngày Vào Ở (người 4)</label><input class="fi" type="date" id="rVaoo4" onchange="syncNguoiFromPersons('vaoo4')"></div>
       </div>
     </div>
     <div id="rmc2" style="display:none">
@@ -1000,11 +1010,11 @@ let houses=[
   {id:'h2',name:'Nhà B',addr:'',owner:'Trần Thị Lan',sdt:'0966.243.895',owner2:'Trần Văn Vực',sdt2:'0912.729.717',tang:3,coc:0,cocDate:'',hd:'',note:''},
 ];
 let rooms=[
-  {id:'r1',house:'h1',room:'P101',nguoi:2,gia:3500000,ten:'Nguyễn Văn A',cccd:'012345678901',sdt:'0901234567',ns:'1990-05-15',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2024-01-15',hdky:'2024-01-15',hd:'2026-12-31',coc:7000000,zalo:'',note:''},
-  {id:'r2',house:'h1',room:'P102',nguoi:1,gia:3000000,ten:'Trần Thị B',cccd:'012345678902',sdt:'0912345678',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2024-03-01',hdky:'2024-03-01',hd:'2026-09-15',coc:6000000,zalo:'',note:''},
-  {id:'r3',house:'h2',room:'P201',nguoi:3,gia:4500000,ten:'Lê Văn C',cccd:'012345678903',sdt:'0923456789',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2025-06-01',hdky:'2025-06-01',hd:'2027-05-31',coc:9000000,zalo:'',note:''},
-  {id:'r4',house:'h2',room:'P202',nguoi:2,gia:3500000,ten:'Phạm Thị D',cccd:'012345678904',sdt:'0934567890',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2025-09-15',hdky:'2025-09-15',hd:'2026-06-30',coc:7000000,zalo:'',note:''},
-  {id:'r5',house:'h1',room:'P301',nguoi:1,gia:3200000,ten:'Hoàng Văn E',cccd:'012345678905',sdt:'0945678901',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2026-01-01',hdky:'2026-01-01',hd:'2027-01-01',coc:6400000,zalo:'',note:''},
+  {id:'r1',house:'h1',room:'P101',nguoi:2,gia:3500000,ten:'Nguyễn Văn A',cccd:'012345678901',sdt:'0901234567',ns:'1990-05-15',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',ten4:'',cccd4:'',bsx4:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2024-01-15',hdky:'2024-01-15',hd:'2026-12-31',coc:7000000,zalo:'',note:''},
+  {id:'r2',house:'h1',room:'P102',nguoi:1,gia:3000000,ten:'Trần Thị B',cccd:'012345678902',sdt:'0912345678',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',ten4:'',cccd4:'',bsx4:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2024-03-01',hdky:'2024-03-01',hd:'2026-09-15',coc:6000000,zalo:'',note:''},
+  {id:'r3',house:'h2',room:'P201',nguoi:3,gia:4500000,ten:'Lê Văn C',cccd:'012345678903',sdt:'0923456789',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',ten4:'',cccd4:'',bsx4:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2025-06-01',hdky:'2025-06-01',hd:'2027-05-31',coc:9000000,zalo:'',note:''},
+  {id:'r4',house:'h2',room:'P202',nguoi:2,gia:3500000,ten:'Phạm Thị D',cccd:'012345678904',sdt:'0934567890',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',ten4:'',cccd4:'',bsx4:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2025-09-15',hdky:'2025-09-15',hd:'2026-06-30',coc:7000000,zalo:'',note:''},
+  {id:'r5',house:'h1',room:'P301',nguoi:1,gia:3200000,ten:'Hoàng Văn E',cccd:'012345678905',sdt:'0945678901',ns:'',bsx:'',dc:'',ten2:'',cccd2:'',sdt2:'',qh2:'',bsx2:'',ten3:'',cccd3:'',bsx3:'',ten4:'',cccd4:'',bsx4:'',c1f:'',c1b:'',c2f:'',c2b:'',vaoo:'2026-01-01',hdky:'2026-01-01',hd:'2027-01-01',coc:6400000,zalo:'',note:''},
 ];
 let monthlyData={};
 let houseSettings={};
@@ -1090,6 +1100,7 @@ function fRooms(){
   const base=h?rooms.filter(r=>r.house===h):rooms;
   const filtered=base.filter(r=>{
     if(!r.vaoo)return true;
+    if(hasBillData(r.id,m,y))return true; // tháng đã có dữ liệu thật (khách cũ) → không ẩn dù khách mới vào sau
     const d=new Date(r.vaoo);
     const ry=d.getFullYear(),rm=d.getMonth()+1;
     return ry<y||(ry===y&&rm<=m);
@@ -1106,6 +1117,14 @@ function getHS(hid){
   return hs;
 }
 
+function hasBillData(rid,m,y){
+  // Kiểm tra (KHÔNG tạo mới) xem tháng m/y đã có dữ liệu thu tiền THẬT cho phòng rid chưa.
+  // Dùng để không loại phòng khỏi các tháng cũ đã từng có khách thuê + thu tiền,
+  // dù khách MỚI hiện tại (r.vaoo) chuyển vào SAU những tháng đó (VD: sau khi checkout & đổi khách).
+  const rec=monthlyData[mKey(m,y)]?.[rid];
+  if(!rec)return false;
+  return !!(rec.paid||rec.dienDau||rec.dienCuoi||rec.nuocDau||rec.nuocCuoi||rec.adj||rec.note);
+}
 function getMD(rid,m,y){
   const k=mKey(m,y);
   if(!monthlyData[k])monthlyData[k]={};
@@ -1164,9 +1183,45 @@ function setMD(rid,m,y,f,v){
 }
 
 function daysInM(m,y){return new Date(+y,+m,0).getDate();}
+function pad(n){return String(n).padStart(2,'0');}
+function normDate(s){
+  // Chuẩn hoá 1 chuỗi ngày về đúng dạng YYYY-MM-DD (có số 0 đệm).
+  // Dữ liệu cũ đôi khi lưu thiếu số 0 (VD "2026-5-9") khiến so sánh chuỗi ngày (a<=b) bị SAI
+  // (vì "2026-5-9" > "2026-05-31" theo thứ tự ký tự!), làm hỏng pro-rata / lịch sử giá / lọc tháng.
+  if(!s||typeof s!=='string')return s;
+  const m=s.trim().match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(!m)return s;
+  return `${m[1]}-${pad(+m[2])}-${pad(+m[3])}`;
+}
+function normalizeDates(){
+  // Chạy 1 lần sau khi load để sửa các ngày lưu sai định dạng (nếu có) — an toàn, không đổi ý nghĩa dữ liệu.
+  let changed=false;
+  (rooms||[]).forEach(r=>{
+    ['vaoo','vaoo2','vaoo3','vaoo4','hdky','hd'].forEach(k=>{
+      if(r[k]){const n=normDate(r[k]);if(n!==r[k]){r[k]=n;changed=true;}}
+    });
+  });
+  Object.values(priceHistory||{}).forEach(hist=>{
+    (hist||[]).forEach(h=>{
+      if(h.from){const n=normDate(h.from);if(n!==h.from){h.from=n;changed=true;}}
+    });
+  });
+  if(changed){saveData();savePriceHistory();console.log('✅ Đã chuẩn hoá định dạng ngày (sửa lỗi so sánh ngày cũ)');}
+}
 function proRata(r,m,y){
-  if(!r.vaoo)return{ok:false,days:0,tot:0,ratio:1};
-  const d=new Date(r.vaoo);
+  // Ưu tiên khách hiện tại (r.vaoo). Nếu ngày vào ở hiện tại KHÔNG rơi vào đúng tháng m/y đang tính
+  // (VD: phòng đã đổi sang khách mới, r.vaoo giờ là ngày vào của khách MỚI) → tìm trong lịch sử khách
+  // cũ (tenantHistory) xem có khách nào vào ở đúng tháng m/y không, để phiếu thu tháng cũ của khách cũ
+  // vẫn được tính đúng theo ngày họ thực sự vào ở, không bị "đè" thành tính từ đầu tháng.
+  let vaoo=r.vaoo;
+  const matchesMY=s=>{if(!s)return false;const d=new Date(s);return d.getMonth()+1===+m&&d.getFullYear()===+y;};
+  if(!matchesMY(vaoo)){
+    const hist=(tenantHistory&&tenantHistory[r.id])||[];
+    const match=hist.find(h=>matchesMY(h.vaoo));
+    if(match)vaoo=match.vaoo;
+  }
+  if(!vaoo)return{ok:false,days:0,tot:0,ratio:1};
+  const d=new Date(vaoo);
   if(d.getMonth()+1!==+m||d.getFullYear()!==+y)return{ok:false,days:0,tot:0,ratio:1};
   const tot=daysInM(m,y);const days=tot-d.getDate()+1;
   if(days>=tot)return{ok:false,days:tot,tot,ratio:1};
@@ -1178,21 +1233,28 @@ function calcR(r,md,m,y){
   const hs=getHS(r.house);
   const pr=proRata(r,cm,cy);
   const rt=pr.ratio;
+  // Lấy giá & số người CÓ HIỆU LỰC cho đúng tháng cm/cy (theo mốc "từ ngày" trong Lịch Sử).
+  // Nếu chưa có lịch sử nào áp dụng trước/trong tháng này → dùng giá/số người hiện tại của phòng (giữ hành vi cũ).
+  // => Sửa số người/giá hôm nay KHÔNG làm thay đổi số tiền các tháng cũ đã tính/đã thu.
+  const lastDayOfM=`${cy}-${pad(cm)}-${pad(daysInM(cm,cy))}`;
+  const eff=getPriceAt(r.id,lastDayOfM);
+  const effGia=eff?eff.gia:(r.gia||0);
+  const effNguoi=eff?(eff.nguoi||1):(r.nguoi||1);
   const mang=Math.round(hs.mang*rt);
-  const vs=Math.round(r.nguoi*(hs.vs||0)*rt);
-  const giat=Math.round(r.nguoi*(hs.giat||0)*rt);
-  const tm=Math.round(r.nguoi*(hs.tm||0)*rt);
-  const ef=(hs.extraFees||[]).filter(f=>f.active).reduce((s,f)=>s+(f.perPerson?f.amount*r.nguoi:f.amount),0);
+  const vs=Math.round(effNguoi*(hs.vs||0)*rt);
+  const giat=Math.round(effNguoi*(hs.giat||0)*rt);
+  const tm=Math.round(effNguoi*(hs.tm||0)*rt);
+  const ef=(hs.extraFees||[]).filter(f=>f.active).reduce((s,f)=>s+(f.perPerson?f.amount*effNguoi:f.amount),0);
   const extra=Math.round(ef*rt);
   const dTieu=Math.round(Math.max(0,(md.dienCuoi||0)-(md.dienDau||0))*100)/100;
-  const dTien=hs.dienMode==='person'?Math.round(r.nguoi*(hs.dienFixed||0)*rt):dTieu*(hs.dien||0);
+  const dTien=hs.dienMode==='person'?Math.round(effNguoi*(hs.dienFixed||0)*rt):dTieu*(hs.dien||0);
   const nTieu=Math.round(Math.max(0,(md.nuocCuoi||0)-(md.nuocDau||0))*100)/100;
-  const nTien=hs.nuocMode==='person'?Math.round(r.nguoi*(hs.nuocFixed||0)*rt):nTieu*(hs.nuoc||0);
+  const nTien=hs.nuocMode==='person'?Math.round(effNguoi*(hs.nuocFixed||0)*rt):nTieu*(hs.nuoc||0);
   const adj=md.adj||0;
-  const giaP=Math.round((r.gia||0)*rt);
+  const giaP=Math.round(effGia*rt);
   const tong=giaP+mang+vs+giat+tm+extra+dTien+nTien+adj;
   const nuocM3=nTieu;
-return{mang,vs,giat,tm,extra,dTieu,dTien,nTieu,nuocM3,nTien,adj,giaP,tong,hs,pr};
+return{mang,vs,giat,tm,extra,dTieu,dTien,nTieu,nuocM3,nTien,adj,giaP,tong,hs,pr,nguoi:effNguoi,gia:effGia};
 }
 
 function dLeft(s){if(!s)return null;return Math.floor((new Date(s)-new Date())/86400000);}
@@ -1277,7 +1339,7 @@ function renderTable(){
     tr.innerHTML=`
       <td class="hn">${hN(r.house)}</td>
       <td class="rn">${r.room}</td>
-      <td><input type="number" min="1" value="${r.nguoi}" style="width:43px" ${dis} onchange="rooms.find(x=>x.id==='${r.id}').nguoi=+this.value;saveData();renderTable()"></td>
+      <td><input type="number" min="1" value="${c.nguoi}" style="width:43px" ${dis} onchange="quickEditNguoi('${r.id}',this.value)" title="Số người áp dụng cho tháng ${m}/${y} (theo lịch sử)"></td>
       <td class="m">${prB}${fmt(c.giaP)}</td>
       <td><div style="display:flex;align-items:center;justify-content:center;gap:4px">
         <label class="tgl"><input type="checkbox" ${md.paid?'checked':''} ${dis} onchange="(function(){getMD('${r.id}','${m}','${y}').paid=this.checked;saveData();checkLock();renderTable();}).call(this)"><span class="tgl-s"></span></label>
@@ -1547,18 +1609,51 @@ function renderHouses(){
 function switchRTab(n){
   [1,2].forEach(i=>{document.getElementById('rmc'+i).style.display=i===n?'block':'none';document.getElementById('rmt'+i).classList.toggle('active',i===n);});
 }
+let _origNguoi=1;
 function openRoomModal(){
   editRid=null;rebuildSels();
-  ['rRoom','rTen','rCccd','rSdt','rNs','rBsx','rDc','rVaoo','rHdky','rHd','rZalo','rNote','rTen2','rCccd2','rSdt2','rQh2','rBsx2','rTen3','rCccd3','rBsx3'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  ['rRoom','rTen','rCccd','rSdt','rNs','rBsx','rDc','rVaoo','rHdky','rHd','rZalo','rNote','rTen2','rCccd2','rSdt2','rQh2','rBsx2','rVaoo2','rTen3','rCccd3','rBsx3','rVaoo3','rTen4','rCccd4','rBsx4','rVaoo4'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
   document.getElementById('rNguoi').value=1;document.getElementById('rGia').value=3500000;document.getElementById('rCoc').value=0;
+  _origNguoi=1;document.getElementById('rNguoiFromWrap').style.display='none';document.getElementById('rNguoiFrom').value='';
   clearCC();switchRTab(1);document.getElementById('moRoom').classList.add('show');
 }
 function openEditRoom(id){
   const r=rooms.find(x=>x.id===id);if(!r)return;
   editRid=id;rebuildSels();
-  const mp={house:'rHouse',room:'rRoom',nguoi:'rNguoi',gia:'rGia',vaoo:'rVaoo',hdky:'rHdky',hd:'rHd',coc:'rCoc',zalo:'rZalo',note:'rNote',ten:'rTen',cccd:'rCccd',sdt:'rSdt',ns:'rNs',bsx:'rBsx',dc:'rDc',ten2:'rTen2',cccd2:'rCccd2',sdt2:'rSdt2',qh2:'rQh2',bsx2:'rBsx2',ten3:'rTen3',cccd3:'rCccd3',bsx3:'rBsx3'};
+  const mp={house:'rHouse',room:'rRoom',nguoi:'rNguoi',gia:'rGia',vaoo:'rVaoo',hdky:'rHdky',hd:'rHd',coc:'rCoc',zalo:'rZalo',note:'rNote',ten:'rTen',cccd:'rCccd',sdt:'rSdt',ns:'rNs',bsx:'rBsx',dc:'rDc',ten2:'rTen2',cccd2:'rCccd2',sdt2:'rSdt2',qh2:'rQh2',bsx2:'rBsx2',vaoo2:'rVaoo2',ten3:'rTen3',cccd3:'rCccd3',bsx3:'rBsx3',vaoo3:'rVaoo3',ten4:'rTen4',cccd4:'rCccd4',bsx4:'rBsx4',vaoo4:'rVaoo4'};
   for(const[rk,mk]of Object.entries(mp)){const e=document.getElementById(mk);if(e)e.value=r[rk]||'';}
+  _origNguoi=r.nguoi||1;document.getElementById('rNguoiFromWrap').style.display='none';document.getElementById('rNguoiFrom').value=new Date().toISOString().slice(0,10);
   clearCC();loadCC(r);switchRTab(1);document.getElementById('moRoom').classList.add('show');
+}
+function onRNguoiChange(){
+  // Chỉ hỏi "áp dụng từ ngày nào" khi ĐANG SỬA phòng có sẵn và số người thực sự thay đổi
+  // (phòng mới thêm thì không cần, vì chưa có tháng nào tính tiền trước đó)
+  const newV=+document.getElementById('rNguoi').value||1;
+  const wrap=document.getElementById('rNguoiFromWrap');
+  const lbl=document.getElementById('rNguoiFromLbl');
+  if(editRid&&newV!==_origNguoi){
+    lbl.textContent=newV>_origNguoi?`+${newV-_origNguoi} người mới (${newV} người)`:`giảm còn ${newV} người`;
+    wrap.style.display='block';
+    if(!document.getElementById('rNguoiFrom').value)document.getElementById('rNguoiFrom').value=new Date().toISOString().slice(0,10);
+  }else{
+    wrap.style.display='none';
+  }
+}
+function syncNguoiFromPersons(trigger){
+  // Tự tính lại "Số Người" = Khách chính + Người 2/3/4 (nếu có tên).
+  // QUAN TRỌNG: ngày hiệu lực CHỈ lấy từ đúng ô "Ngày Vào Ở" của người vừa được thêm/sửa
+  // (KHÔNG được lấy nhầm ngày vào ở của người khác đã có từ trước, nếu không sẽ tính lùi
+  // ngày hiệu lực về quá khứ và làm sai các tháng cũ).
+  const ten2=document.getElementById('rTen2').value.trim();
+  const ten3=document.getElementById('rTen3').value.trim();
+  const ten4=document.getElementById('rTen4').value.trim();
+  const derived=1+(ten2?1:0)+(ten3?1:0)+(ten4?1:0);
+  document.getElementById('rNguoi').value=derived;
+  const fieldMap={ten2:'rVaoo2',vaoo2:'rVaoo2',ten3:'rVaoo3',vaoo3:'rVaoo3',ten4:'rVaoo4',vaoo4:'rVaoo4'};
+  const dateFieldId=fieldMap[trigger];
+  const triggerDate=dateFieldId?document.getElementById(dateFieldId).value:'';
+  if(triggerDate)document.getElementById('rNguoiFrom').value=triggerDate;
+  onRNguoiChange();
 }
 function saveRoom(){
   const nm=document.getElementById('rRoom').value.trim();
@@ -1569,7 +1664,23 @@ function saveRoom(){
   const dup=rooms.find(r=>r.house===hid&&r.room.trim().toLowerCase()===nm.toLowerCase()&&r.id!==editRid);
   if(dup){toast(`❌ Phòng "${nm}" đã tồn tại trong ${hN(hid)}!`,'error');return;}
   const coc=+document.getElementById('rCoc').value||0;
-  const data={house:hid,room:nm,nguoi:+document.getElementById('rNguoi').value||1,gia:+document.getElementById('rGia').value||0,vaoo:document.getElementById('rVaoo').value,hdky:document.getElementById('rHdky').value,hd:document.getElementById('rHd').value,coc,zalo:document.getElementById('rZalo').value,note:document.getElementById('rNote').value,ten:document.getElementById('rTen').value,cccd:document.getElementById('rCccd').value,sdt:document.getElementById('rSdt').value,ns:document.getElementById('rNs').value,bsx:document.getElementById('rBsx').value,dc:document.getElementById('rDc').value,ten2:document.getElementById('rTen2').value,cccd2:document.getElementById('rCccd2').value,sdt2:document.getElementById('rSdt2').value,qh2:document.getElementById('rQh2').value,bsx2:document.getElementById('rBsx2').value,ten3:document.getElementById('rTen3').value,cccd3:document.getElementById('rCccd3').value,bsx3:document.getElementById('rBsx3').value,c1f:document.getElementById('v-c1f').value,c1b:document.getElementById('v-c1b').value,c2f:document.getElementById('v-c2f').value,c2b:document.getElementById('v-c2b').value};
+  const newNguoi=+document.getElementById('rNguoi').value||1;
+  const data={house:hid,room:nm,nguoi:newNguoi,gia:+document.getElementById('rGia').value||0,vaoo:document.getElementById('rVaoo').value,hdky:document.getElementById('rHdky').value,hd:document.getElementById('rHd').value,coc,zalo:document.getElementById('rZalo').value,note:document.getElementById('rNote').value,ten:document.getElementById('rTen').value,cccd:document.getElementById('rCccd').value,sdt:document.getElementById('rSdt').value,ns:document.getElementById('rNs').value,bsx:document.getElementById('rBsx').value,dc:document.getElementById('rDc').value,ten2:document.getElementById('rTen2').value,cccd2:document.getElementById('rCccd2').value,sdt2:document.getElementById('rSdt2').value,qh2:document.getElementById('rQh2').value,bsx2:document.getElementById('rBsx2').value,vaoo2:document.getElementById('rVaoo2').value,ten3:document.getElementById('rTen3').value,cccd3:document.getElementById('rCccd3').value,bsx3:document.getElementById('rBsx3').value,vaoo3:document.getElementById('rVaoo3').value,ten4:document.getElementById('rTen4').value,cccd4:document.getElementById('rCccd4').value,bsx4:document.getElementById('rBsx4').value,vaoo4:document.getElementById('rVaoo4').value,c1f:document.getElementById('v-c1f').value,c1b:document.getElementById('v-c1b').value,c2f:document.getElementById('v-c2f').value,c2b:document.getElementById('v-c2b').value};
+  // Nếu đang sửa phòng có sẵn và số người thay đổi → ghi vào Lịch Sử với ngày hiệu lực,
+  // để các tháng TRƯỚC ngày đó vẫn tính đúng số người cũ (không bị ảnh hưởng tiền thu đã tính).
+  if(editRid&&newNguoi!==_origNguoi){
+    const oldRoom=rooms.find(x=>x.id===editRid);
+    const fromDate=document.getElementById('rNguoiFrom').value||new Date().toISOString().slice(0,10);
+    if(!priceHistory[editRid])priceHistory[editRid]=[];
+    if(!priceHistory[editRid].length){
+      // Lần đầu tạo lịch sử cho phòng này → thêm 1 mốc GỐC bằng giá trị CŨ, hiệu lực từ ngày vào ở
+      // (hoặc thật sớm nếu không có), để các tháng trước ngày đổi không bị "rơi" về giá trị mới.
+      const baseDate=(oldRoom?.vaoo&&oldRoom.vaoo<fromDate)?oldRoom.vaoo:'2000-01-01';
+      priceHistory[editRid].push({from:baseDate,gia:oldRoom?.gia||0,nguoi:_origNguoi,note:'Mốc gốc (trước khi điều chỉnh)'});
+    }
+    priceHistory[editRid].push({from:fromDate,gia:data.gia,nguoi:newNguoi,note:newNguoi>_origNguoi?`Thêm người ở (${_origNguoi}→${newNguoi})`:`Bớt người ở (${_origNguoi}→${newNguoi})`});
+    savePriceHistory();
+  }
   if(editRid){
     const i=rooms.findIndex(x=>x.id===editRid);
     if(i>=0){rooms[i]={...rooms[i],...data};
@@ -1687,9 +1798,9 @@ function renderR(){
   const MN=['','Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
   const ownerLine=h?[h.owner&&h.sdt?`${h.owner} ☎ ${h.sdt}`:'',h.owner2&&h.sdt2?`${h.owner2} ☎ ${h.sdt2}`:''].filter(Boolean).join(' &nbsp;|&nbsp; '):'';
   const qrHtml=qrUrl?`<div style="text-align:center;flex-shrink:0"><img src="${qrUrl}" style="width:65px;height:65px;border-radius:5px;border:1px solid #e5e7eb;display:block"><p style="font-size:9px;color:#888;margin-top:2px">QR chuyển khoản</p></div>`:`<div style="width:65px;height:65px;border:2px dashed #ddd;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:9px;color:#bbb;text-align:center;flex-shrink:0;line-height:1.3">QR<br>CK</div>`;
-  const dienTxt=hs.dienMode==='person'?`Điện (${r.nguoi}ng×${fmt(hs.dienFixed)}đ/ng)`:
+  const dienTxt=hs.dienMode==='person'?`Điện (${c.nguoi}ng×${fmt(hs.dienFixed)}đ/ng)`:
     `Điện (${md.dienDau||0}→${md.dienCuoi||0}=${c.dTieu}kWh×${fmt(hs.dien)}đ)`;
-  const nuocTxt=hs.nuocMode==='person'?`Nước (${r.nguoi}ng×${fmt(hs.nuocFixed)}đ/ng)`:
+  const nuocTxt=hs.nuocMode==='person'?`Nước (${c.nguoi}ng×${fmt(hs.nuocFixed)}đ/ng)`:
     `Nước (${md.nuocDau||0}→${md.nuocCuoi||0}=${c.nTieu}m³×${fmt(hs.nuoc)}đ)`;
   const extraFeeList=(hs.extraFees||[]).filter(f=>f.active);
   wrap.innerHTML=`<div id="rPaper" style="background:#fff;width:480px;font-family:'Be Vietnam Pro',sans-serif;color:#1a1a2e;border-radius:10px;overflow:hidden;box-shadow:0 8px 40px rgba(0,0,0,.4)">
@@ -1717,10 +1828,10 @@ function renderR(){
       <tr style="background:#f0f4f8"><td colspan="2" style="padding:5px 15px;font-size:9px;font-weight:700;color:#1F4E79;text-transform:uppercase;letter-spacing:.5px">Khoản Thu</td></tr>
       <tr style="background:#fff"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Tiền thuê phòng${c.pr.ok?` <span style="font-size:10px;color:#f97316">(${c.pr.days}/${c.pr.tot} ngày)</span>`:''}</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.giaP)} đ</td></tr>
       <tr style="background:#fafafa"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Internet / Mạng</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.mang)} đ</td></tr>
-      <tr style="background:#fff"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Vệ sinh (${r.nguoi}ng×${fmt(hs.vs)}đ)</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.vs)} đ</td></tr>
-      <tr style="background:#fafafa"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Máy giặt (${r.nguoi}ng×${fmt(hs.giat)}đ)</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.giat)} đ</td></tr>
-      ${c.tm>0?`<tr style="background:#fff"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Thang máy (${r.nguoi}ng×${fmt(hs.tm)}đ)</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.tm)} đ</td></tr>`:''}
-      ${extraFeeList.map((f,i)=>`<tr style="background:${i%2===0?'#fafafa':'#fff'}"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">${f.name}${f.perPerson?' ('+r.nguoi+'ng)':''}</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(f.perPerson?f.amount*r.nguoi:f.amount)} đ</td></tr>`).join('')}
+      <tr style="background:#fff"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Vệ sinh (${c.nguoi}ng×${fmt(hs.vs)}đ)</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.vs)} đ</td></tr>
+      <tr style="background:#fafafa"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Máy giặt (${c.nguoi}ng×${fmt(hs.giat)}đ)</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.giat)} đ</td></tr>
+      ${c.tm>0?`<tr style="background:#fff"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">Thang máy (${c.nguoi}ng×${fmt(hs.tm)}đ)</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.tm)} đ</td></tr>`:''}
+      ${extraFeeList.map((f,i)=>`<tr style="background:${i%2===0?'#fafafa':'#fff'}"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">${f.name}${f.perPerson?' ('+c.nguoi+'ng)':''}</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(f.perPerson?f.amount*c.nguoi:f.amount)} đ</td></tr>`).join('')}
       <tr style="background:#fafafa"><td style="padding:5px 15px;border-bottom:1px solid #f0f0f0">${dienTxt}</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #f0f0f0">${fmt(c.dTien)} đ</td></tr>
       <tr style="background:#fff"><td style="padding:5px 15px;border-bottom:1px solid #e5e7eb">${nuocTxt}</td><td style="padding:5px 15px;text-align:right;font-weight:600;color:#1F4E79;border-bottom:1px solid #e5e7eb">${fmt(c.nTien)} đ</td></tr>
       ${(md.adj||0)!==0?`<tr style="background:${md.adj<0?'#fff5f5':'#f0fff4'}"><td style="padding:5px 15px;border-bottom:1px solid #e5e7eb;color:${md.adj<0?'#dc2626':'#16a34a'};font-weight:600">${md.adj<0?'Giảm giá / Điều chỉnh':'Phụ thu'}</td><td style="padding:5px 15px;text-align:right;font-weight:700;color:${md.adj<0?'#dc2626':'#16a34a'};border-bottom:1px solid #e5e7eb">${md.adj<0?'-':'+'}${fmt(Math.abs(md.adj))} đ</td></tr>`:''}
@@ -1759,10 +1870,10 @@ function sendZaloR(){
   const deadline=document.getElementById('rDeadline').value||'Ngày 26-31 hàng tháng';
   const bank=document.getElementById('rBank').value;
   const ownerLine=h?[h.owner&&h.sdt?`${h.owner} ☎ ${h.sdt}`:'',h.owner2&&h.sdt2?`${h.owner2} ☎ ${h.sdt2}`:''].filter(Boolean).join('\n'):'';
-  const extraLines=(hs.extraFees||[]).filter(f=>f.active).map(f=>`${f.name}: ${fmt(f.perPerson?f.amount*r.nguoi:f.amount)} đ`).join('\n');
-  const dienTxt=hs.dienMode==='person'?`Điện (${r.nguoi}ng×${fmt(hs.dienFixed)}đ): ${fmt(c.dTien)} đ`:`Điện ${c.dTieu}kWh×${fmt(hs.dien)}đ: ${fmt(c.dTien)} đ`;
-  const nuocTxt=hs.nuocMode==='person'?`Nước (${r.nguoi}ng×${fmt(hs.nuocFixed)}đ): ${fmt(c.nTien)} đ`:`Nước ${c.nTieu}m³×${fmt(hs.nuoc)}đ: ${fmt(c.nTien)} đ`;
-  const msg=[`🧾 PHIẾU THU TIỀN PHÒNG`,`🏠 ${h?h.name:'Nhà trọ'} — Phòng ${r.room} — Tháng ${m}/${y}`,`👤 ${r.ten||'Khách thuê'}`,`─────────────────────`,`💰 Tiền phòng${c.pr.ok?` (${c.pr.days}/${c.pr.tot}n)`:''}:   ${fmt(c.giaP)} đ`,`🌐 Mạng:              ${fmt(c.mang)} đ`,`🧹 Vệ sinh (${r.nguoi}ng): ${fmt(c.vs)} đ`,`🫧 Máy giặt (${r.nguoi}ng):${fmt(c.giat)} đ`,...(c.tm>0?[`🛗 Thang máy:         ${fmt(c.tm)} đ`]:[]),...(extraLines?[extraLines]:[]),`⚡ ${dienTxt}`,`💧 ${nuocTxt}`,...((md.adj||0)!==0?[`${md.adj<0?'🔻 Giảm giá':'🔺 Phụ thu'}:     ${fmt(Math.abs(md.adj))} đ`]:[]),`─────────────────────`,`💵 TỔNG: ${fmt(c.tong)} đ`,`⏰ Hạn: ${deadline}`,...(bank?[`💳 CK: ${bank}`]:[]),...(ownerLine?[`📞 ${ownerLine}`]:[]),`Cảm ơn! 🙏`].join('\n');
+  const extraLines=(hs.extraFees||[]).filter(f=>f.active).map(f=>`${f.name}: ${fmt(f.perPerson?f.amount*c.nguoi:f.amount)} đ`).join('\n');
+  const dienTxt=hs.dienMode==='person'?`Điện (${c.nguoi}ng×${fmt(hs.dienFixed)}đ): ${fmt(c.dTien)} đ`:`Điện ${c.dTieu}kWh×${fmt(hs.dien)}đ: ${fmt(c.dTien)} đ`;
+  const nuocTxt=hs.nuocMode==='person'?`Nước (${c.nguoi}ng×${fmt(hs.nuocFixed)}đ): ${fmt(c.nTien)} đ`:`Nước ${c.nTieu}m³×${fmt(hs.nuoc)}đ: ${fmt(c.nTien)} đ`;
+  const msg=[`🧾 PHIẾU THU TIỀN PHÒNG`,`🏠 ${h?h.name:'Nhà trọ'} — Phòng ${r.room} — Tháng ${m}/${y}`,`👤 ${r.ten||'Khách thuê'}`,`─────────────────────`,`💰 Tiền phòng${c.pr.ok?` (${c.pr.days}/${c.pr.tot}n)`:''}:   ${fmt(c.giaP)} đ`,`🌐 Mạng:              ${fmt(c.mang)} đ`,`🧹 Vệ sinh (${c.nguoi}ng): ${fmt(c.vs)} đ`,`🫧 Máy giặt (${c.nguoi}ng):${fmt(c.giat)} đ`,...(c.tm>0?[`🛗 Thang máy:         ${fmt(c.tm)} đ`]:[]),...(extraLines?[extraLines]:[]),`⚡ ${dienTxt}`,`💧 ${nuocTxt}`,...((md.adj||0)!==0?[`${md.adj<0?'🔻 Giảm giá':'🔺 Phụ thu'}:     ${fmt(Math.abs(md.adj))} đ`]:[]),`─────────────────────`,`💵 TỔNG: ${fmt(c.tong)} đ`,`⏰ Hạn: ${deadline}`,...(bank?[`💳 CK: ${bank}`]:[]),...(ownerLine?[`📞 ${ownerLine}`]:[]),`Cảm ơn! 🙏`].join('\n');
   if(r.zalo&&r.zalo.trim())try{window.open(r.zalo.trim(),'_blank');}catch(e){}
   copyTxt(msg);
 }
@@ -1790,8 +1901,9 @@ function checkoutRoom(rid){
   if(dep){dep.returned=true;dep.returnedDate=checkoutDate;}
   // Reset thông tin khách (giữ phòng)
   r.ten='';r.cccd='';r.sdt='';r.ns='';r.bsx='';r.dc='';
-  r.ten2='';r.cccd2='';r.sdt2='';r.qh2='';r.bsx2='';
-  r.ten3='';r.cccd3='';r.bsx3='';
+  r.ten2='';r.cccd2='';r.sdt2='';r.qh2='';r.bsx2='';r.vaoo2='';
+  r.ten3='';r.cccd3='';r.bsx3='';r.vaoo3='';
+  r.ten4='';r.cccd4='';r.bsx4='';r.vaoo4='';
   r.vaoo='';r.hdky='';r.hd='';r.coc=0;r.c1f='';r.c1b='';r.c2f='';r.c2b='';
   saveData();renderHD();renderTable();
   toast(`✅ Đã lưu lịch sử khách ${r.ten||'cũ'} — Phòng ${r.room} sẵn sàng đón khách mới!`,'success');
@@ -2305,6 +2417,31 @@ function getPriceAt(rid, dateStr){
   for(const h of sorted){if(h.from<=dateStr)result=h;}
   return result;
 }
+function quickEditNguoi(rid,val){
+  // Sửa số người ở nhanh trong bảng — BẮT BUỘC hỏi ngày áp dụng và ghi vào Lịch Sử,
+  // để không làm thay đổi số tiền các tháng cũ đã tính (tránh lỗi tính lại tiền thu quá khứ).
+  const r=rooms.find(x=>x.id===rid);if(!r){renderTable();return;}
+  const newV=Math.max(1,+val||1);
+  const oldV=r.nguoi||1;
+  if(newV===oldV){renderTable();return;}
+  const today=new Date().toISOString().slice(0,10);
+  const from=prompt(`Áp dụng ${newV} người kể từ ngày nào?\n(Các tháng TRƯỚC ngày này vẫn tính đúng ${oldV} người như cũ, không bị ảnh hưởng)`,today);
+  if(from===null){renderTable();return;} // huỷ → khôi phục giá trị ô nhập
+  const fromDate=/^\d{4}-\d{2}-\d{2}$/.test(from)?from:today;
+  if(!priceHistory[rid])priceHistory[rid]=[];
+  if(!priceHistory[rid].length){
+    // Lần đầu tạo lịch sử cho phòng này → thêm mốc GỐC bằng số người CŨ, để các tháng trước ngày đổi
+    // không bị fallback sai về số người MỚI (r.nguoi sẽ được cập nhật ngay bên dưới).
+    const baseDate=(r.vaoo&&r.vaoo<fromDate)?r.vaoo:'2000-01-01';
+    priceHistory[rid].push({from:baseDate,gia:r.gia||0,nguoi:oldV,note:'Mốc gốc (trước khi điều chỉnh)'});
+  }
+  priceHistory[rid].push({from:fromDate,gia:r.gia||0,nguoi:newV,note:'Điều chỉnh số người ở'});
+  savePriceHistory();
+  r.nguoi=newV;
+  saveData();
+  toast(`✅ Áp dụng ${newV} người từ ${fromDate}. Các tháng trước đó vẫn giữ nguyên tiền đã tính.`,'success');
+  renderTable();
+}
 
 function openProRata(rid, m, y){
   const r=rooms.find(x=>x.id===rid);if(!r)return;
@@ -2312,6 +2449,9 @@ function openProRata(rid, m, y){
   const daysInMonth=new Date(+y,+m,0).getDate();
   const today=new Date().toISOString().slice(0,10);
   const hs=getHS(r.house);
+  const lastDayOfM=`${y}-${pad(+m)}-${pad(daysInMonth)}`;
+  const effH=getPriceAt(r.id,lastDayOfM);
+  const nguoiAtM=effH?(effH.nguoi||1):(r.nguoi||1);
 
   // Tính phí/người hiện tại
   const vsPerP=hs.vs||settings.vs||0;
@@ -2325,7 +2465,7 @@ function openProRata(rid, m, y){
   el.innerHTML=`
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:20px;width:440px;max-width:100%">
       <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">📐 Tính Điều Chỉnh Pro-Rata</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Phòng ${r.room} — Tháng ${m}/${y} (${daysInMonth} ngày) — Hiện ${r.nguoi||1} người</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Phòng ${r.room} — Tháng ${m}/${y} (${daysInMonth} ngày) — ${nguoiAtM} người</div>
 
       <!-- Phí/người hiện tại -->
       <div style="background:var(--bg3);border-radius:6px;padding:10px;margin-bottom:12px;font-size:11px">
@@ -2722,10 +2862,14 @@ function renderBC2(){
   const sqREl=document.getElementById('sqRepaid');if(sqREl)sqREl.value=repaid?Number(repaid).toLocaleString('vi-VN'):'0';
   const pad=n=>String(n).padStart(2,'0');
 
-  // Số dư = số dư ban đầu + tiền vay. Trả nợ tính theo từng tháng qua expenses
-  let bal=initBal+loan;
-  let remainDebt=loan;
-  let totThu=0,totChi=0,totAlloc=0,totCocIn=0,totCocOut=0,totHoan=0,totThuHoi=0;
+  // Số dư = số dư ban đầu + tiền vay ĐÃ VỀ TRƯỚC kỳ xem. Vay về trong kỳ được cộng đúng vào tháng giải ngân.
+  // (Trước đây cộng thẳng TOÀN BỘ tổng vay ngay từ đầu kỳ, kể cả khoản vay chưa thực về => số dư các tháng
+  // trước ngày giải ngân bị tính thừa. Nay tính theo đúng ngày trong loanEntries.)
+  const fmStr=months.length?`${months[0].y}-${pad(+months[0].m)}-01`:null;
+  const loanBefore=loanEntries.filter(e=>{const d=fixDate(e.date);return fmStr&&(!d||d<fmStr);}).reduce((s,e)=>s+(e.amount||0),0);
+  let bal=initBal+loanBefore;
+  let remainDebt=loanBefore; // Nợ tính đến trước kỳ xem = tiền đã vay TRƯỚC kỳ này, KHÔNG tính khoản vay tương lai chưa xảy ra
+  let totThu=0,totChi=0,totAlloc=0,totCocIn=0,totCocOut=0,totHoan=0,totThuHoi=0,totLoan=0;
 
   const tbody=document.getElementById('b2Body');if(!tbody)return;tbody.innerHTML='';
 
@@ -2737,9 +2881,15 @@ function renderBC2(){
     // Thu đã thu
     let mThu=0;
     (selH?rooms.filter(r=>r.house===selH):rooms).filter(r=>{
-      if(!r.vaoo)return true;const d=new Date(r.vaoo);
+      if(!r.vaoo)return true;
+      if(hasBillData(r.id,mm,yy))return true;
+      const d=new Date(r.vaoo);
       return d.getFullYear()<yy||(d.getFullYear()===yy&&d.getMonth()+1<=mm);
     }).forEach(r=>{const md=getMD(r.id,m,y);if(md.paid||isLock)mThu+=calcR(r,md,m,y).tong;});
+
+    // Tiền vay về đúng tháng này (theo ngày thực tế của từng khoản vay)
+    let mLoan=0;
+    loanEntries.filter(e=>{const d=fixDate(e.date);return d&&d>=f1&&d<=f2;}).forEach(e=>{mLoan+=e.amount||0;});
 
     // Chi phí tháng này (Trả Nợ Vay: trừ cả số dư TK lẫn Còn Nợ)
     let mChi=0,mTraNo=0;
@@ -2747,7 +2897,7 @@ function renderBC2(){
       mChi+=e.amount||0;
       if(e.cat==='Trả Nợ Vay')mTraNo+=e.amount||0;
     });
-    remainDebt=Math.max(0,remainDebt-mTraNo);
+    remainDebt=Math.max(0,remainDebt+mLoan-mTraNo); // + vay về tháng này - trả nợ tháng này
 
     // Chi phân bổ — tổng tiền thực tế bỏ ra (tháng bắt đầu)
     let mAlloc=0;
@@ -2762,9 +2912,9 @@ function renderBC2(){
       if(d.type==='out'){if(dd>=f1&&dd<=f2)mCocOut+=d.amount||0;if(d.returned&&dr>=f1&&dr<=f2)mThuHoi+=d.amount||0;}
     });
 
-    const flow=mThu+mCocIn+mThuHoi-mHoan-mCocOut-mChi-mAlloc;
+    const flow=mThu+mCocIn+mThuHoi+mLoan-mHoan-mCocOut-mChi-mAlloc;
     bal+=flow;
-    totThu+=mThu;totChi+=mChi;totAlloc+=mAlloc;totCocIn+=mCocIn;totCocOut+=mCocOut;totHoan+=mHoan;totThuHoi+=mThuHoi;
+    totThu+=mThu;totChi+=mChi;totAlloc+=mAlloc;totCocIn+=mCocIn;totCocOut+=mCocOut;totHoan+=mHoan;totThuHoi+=mThuHoi;totLoan+=mLoan;
 
     tbody.innerHTML+=`<tr style="${!isLock&&mThu===0?'opacity:.6':''}">
       <td style="font-weight:700;color:var(--text);white-space:nowrap">T${m}/${y} ${isLock?'🔒':'⏳'}</td>
@@ -2773,6 +2923,7 @@ function renderBC2(){
       <td class="m" style="color:var(--red)">${mHoan?'-'+fmt(mHoan):'—'}</td>
       <td class="m" style="color:#60a5fa">${mThuHoi?'+'+fmt(mThuHoi):'—'}</td>
       <td class="m" style="color:var(--red)">${mCocOut?'-'+fmt(mCocOut):'—'}</td>
+      <td class="m" style="color:#eab308;font-weight:700">${mLoan?'+'+fmt(mLoan):'—'}</td>
       <td class="m" style="color:var(--red)">${(mChi-mTraNo)?'-'+fmt(mChi-mTraNo):'—'}</td>
       <td class="m" style="color:#f97316;font-weight:700">${mTraNo?'-'+fmt(mTraNo):'—'}</td>
       <td class="m" style="color:var(--red)">${mAlloc?'-'+fmt(mAlloc):'—'}</td>
@@ -2804,10 +2955,14 @@ function renderBC3(){
   const sq3REl=document.getElementById('sq3Repaid');if(sq3REl)sq3REl.value=repaid?Number(repaid).toLocaleString('vi-VN'):'0';
   const pad=n=>String(n).padStart(2,'0');
 
-  // Số dư = số dư ban đầu + tiền vay. Trả nợ tính theo từng tháng qua expenses
-  let bal=initBal+loan;
-  let remainDebt=loan;
-  let totThu=0,totChi=0,totAlloc=0,totCocIn=0,totCocOut=0,totHoan=0,totThuHoi=0;
+  // Số dư = số dư ban đầu + tiền vay ĐÃ VỀ TRƯỚC kỳ xem. Vay về trong kỳ được cộng đúng vào tháng giải ngân
+  // (trước đây cộng thẳng toàn bộ tổng vay ngay từ đầu kỳ dù chưa thực về => số dư các tháng trước ngày
+  // giải ngân bị tính thừa, y hệt lỗi ở tab Tiền Mặt).
+  const fmStr=months.length?`${months[0].y}-${pad(+months[0].m)}-01`:null;
+  const loanBefore=loanEntries.filter(e=>{const d=fixDate(e.date);return fmStr&&(!d||d<fmStr);}).reduce((s,e)=>s+(e.amount||0),0);
+  let bal=initBal+loanBefore;
+  let remainDebt=loanBefore; // Nợ tính đến trước kỳ xem = tiền đã vay TRƯỚC kỳ này, KHÔNG tính khoản vay tương lai chưa xảy ra
+  let totThu=0,totChi=0,totAlloc=0,totCocIn=0,totCocOut=0,totHoan=0,totThuHoi=0,totLoan=0;
 
   const tbody=document.getElementById('b3Body');if(!tbody)return;tbody.innerHTML='';
 
@@ -2819,9 +2974,15 @@ function renderBC3(){
     // Thu đã thu
     let mThu=0;
     (selH?rooms.filter(r=>r.house===selH):rooms).filter(r=>{
-      if(!r.vaoo)return true;const d=new Date(r.vaoo);
+      if(!r.vaoo)return true;
+      if(hasBillData(r.id,mm,yy))return true;
+      const d=new Date(r.vaoo);
       return d.getFullYear()<yy||(d.getFullYear()===yy&&d.getMonth()+1<=mm);
     }).forEach(r=>{const md=getMD(r.id,m,y);if(md.paid||isLock)mThu+=calcR(r,md,m,y).tong;});
+
+    // Tiền vay về đúng tháng này (theo ngày thực tế của từng khoản vay)
+    let mLoan=0;
+    loanEntries.filter(e=>{const d=fixDate(e.date);return d&&d>=f1&&d<=f2;}).forEach(e=>{mLoan+=e.amount||0;});
 
     // Chi phí tháng này (Trả Nợ Vay: trừ cả số dư TK lẫn Còn Nợ)
     let mChi=0,mTraNo=0;
@@ -2829,7 +2990,7 @@ function renderBC3(){
       mChi+=e.amount||0;
       if(e.cat==='Trả Nợ Vay')mTraNo+=e.amount||0;
     });
-    remainDebt=Math.max(0,remainDebt-mTraNo);
+    remainDebt=Math.max(0,remainDebt+mLoan-mTraNo); // + vay về tháng này - trả nợ tháng này
 
     // Chi phân bổ — chia đều theo tháng (kế toán)
     const mAlloc=allocForM(m,y,selH||'');
@@ -2843,9 +3004,9 @@ function renderBC3(){
       if(d.type==='out'){if(dd>=f1&&dd<=f2)mCocOut+=d.amount||0;if(d.returned&&dr>=f1&&dr<=f2)mThuHoi+=d.amount||0;}
     });
 
-    const flow=mThu+mCocIn+mThuHoi-mHoan-mCocOut-mChi-mAlloc;
+    const flow=mThu+mCocIn+mThuHoi+mLoan-mHoan-mCocOut-mChi-mAlloc;
     bal+=flow;
-    totThu+=mThu;totChi+=mChi;totAlloc+=mAlloc;totCocIn+=mCocIn;totCocOut+=mCocOut;totHoan+=mHoan;totThuHoi+=mThuHoi;
+    totThu+=mThu;totChi+=mChi;totAlloc+=mAlloc;totCocIn+=mCocIn;totCocOut+=mCocOut;totHoan+=mHoan;totThuHoi+=mThuHoi;totLoan+=mLoan;
 
     tbody.innerHTML+=`<tr style="${!isLock&&mThu===0?'opacity:.6':''}">
       <td style="font-weight:700;color:var(--text);white-space:nowrap">T${m}/${y} ${isLock?'🔒':'⏳'}</td>
@@ -2854,6 +3015,7 @@ function renderBC3(){
       <td class="m" style="color:var(--red)">${mHoan?'-'+fmt(mHoan):'—'}</td>
       <td class="m" style="color:#60a5fa">${mThuHoi?'+'+fmt(mThuHoi):'—'}</td>
       <td class="m" style="color:var(--red)">${mCocOut?'-'+fmt(mCocOut):'—'}</td>
+      <td class="m" style="color:#eab308;font-weight:700">${mLoan?'+'+fmt(mLoan):'—'}</td>
       <td class="m" style="color:var(--red)">${(mChi-mTraNo)?'-'+fmt(mChi-mTraNo):'—'}</td>
       <td class="m" style="color:#f97316;font-weight:700">${mTraNo?'-'+fmt(mTraNo):'—'}</td>
       <td class="m" style="color:var(--red)">${mAlloc?'-'+fmt(mAlloc):'—'}</td>
@@ -2945,29 +3107,29 @@ function exportBCXLSX(){
     wb.Sheets['Phân Tích Chi Phí']=makeSheet(data1,[12,8,8,18,30,15,13,18]);
 
     // ═══ SHEET 2 & 3: SỔ QUỸ ═══
-    const sqHeaders=['Tháng','Thu Tiền','+ Cọc KH','- Hoàn Cọc','+ Thu Hồi CN','- Trả Cọc CN','- Chi Phí','- Chi P.Bổ','Dòng Tiền','Số Dư TK','Còn Nợ'];
-    const sqColW=[12,14,12,12,13,13,12,12,13,14,13];
+    const sqHeaders=['Tháng','Thu Tiền','+ Cọc KH','- Hoàn Cọc','+ Thu Hồi CN','- Trả Cọc CN','+ Vay Về','- Chi Phí','- Trả Nợ','- Chi P.Bổ','Dòng Tiền','Số Dư TK','Còn Nợ'];
+    const sqColW=[12,14,12,12,13,13,13,12,12,12,13,14,13];
 
     function makeSQSheet(bodyId,sheetTitle){
       const data=[
-        [cv(sheetTitle,TITLE),...Array(10).fill(cv('',TITLE))],
+        [cv(sheetTitle,TITLE),...Array(12).fill(cv('',TITLE))],
         sqHeaders.map(h=>cv(h,HEAD))
       ];
       document.querySelectorAll(`#${bodyId} tr`).forEach((tr,i)=>{
         const cells=[...tr.querySelectorAll('td')];
         const bg=i%2===0?'EFF4FF':'FFFFFF';
-        const rowData=cells.slice(0,11).map((td,ci)=>{
+        const rowData=cells.slice(0,13).map((td,ci)=>{
           const txt=td.textContent.trim().replace(/[+\-]?[\s]/g,'').replace(/[^\d.,]/g,'').replace(/\./g,'').replace(/,/g,'.');
           const num=parseFloat(txt);
           // Cột tháng (0) là text, các cột tiền là số
           if(ci===0)return cv(td.textContent.trim(),S(bg,'212121',true));
           if(!isNaN(num)&&num!==0){
             const isNeg=td.textContent.includes('-')||td.style.color?.includes('red')||td.style.color?.includes('f85149')||td.style.color?.includes('B71C1C');
-            const isPos=td.style.color?.includes('green')||td.style.color?.includes('34d39')||td.style.color?.includes('1B5E20');
-            const isBal=ci===9;
+            const isPos=td.style.color?.includes('green')||td.style.color?.includes('34d39')||td.style.color?.includes('1B5E20')||td.style.color?.includes('eab308');
+            const isBal=ci===11;
             const bgC=isBal?(num>=0?'FFF8E1':'FFEBEE'):bg;
             const colC=isBal?(num>=0?'E65100':'B71C1C'):(isNeg?'B71C1C':isPos?'1B5E20':'212121');
-            return cv(isNeg?-Math.abs(num):num,S(bgC,colC,ci>=8,ci>0?'right':'left'));
+            return cv(isNeg?-Math.abs(num):num,S(bgC,colC,ci>=10,ci>0?'right':'left'));
           }
           return cv(td.textContent.trim()==='—'?'':td.textContent.trim(),S(bg,'888888',false,'right'));
         });
@@ -3085,6 +3247,7 @@ function renderProfit(){
     const list=sortRooms(h?rooms.filter(r=>r.house===h):rooms);
     list.filter(r=>{
       if(!r.vaoo)return true;
+      if(hasBillData(r.id,m,y))return true;
       const d=new Date(r.vaoo);return d.getFullYear()<+y||(d.getFullYear()===+y&&d.getMonth()+1<=+m);
     }).forEach(r=>{
       const md=getMD(r.id,m,y);const c=calcR(r,md,m,y);
@@ -3104,7 +3267,9 @@ function renderProfit(){
     if(!d)return false;
     return monthRanges.some(r=>d>=r.f1&&d<=r.f2);
   }
-  const expList=(h?expenses.filter(e=>e.house===h):expenses).filter(e=>inRange(e.date));
+  // "Trả Nợ Vay" là trả GỐC khoản vay — không phải chi phí kinh doanh, không được trừ vào Lợi Nhuận
+  // (khi vay tiền cũng không tính là doanh thu, nên trả nợ gốc cũng không tính là chi phí — chỉ ảnh hưởng dòng tiền/Còn Nợ)
+  const expList=(h?expenses.filter(e=>e.house===h):expenses).filter(e=>e.cat!=='Trả Nợ Vay'&&inRange(e.date));
   const chiThuong=expList.reduce((s,e)=>s+(e.amount||0),0);
   const chiAlloc=months.reduce((s,{m,y})=>s+allocForM(m,y,h),0);
   const tChi=chiThuong+chiAlloc;
@@ -3118,9 +3283,11 @@ function renderProfit(){
       let hThu=0,hChi=0;
       months.forEach(({m,y})=>{
         rooms.filter(r=>r.house===hx.id).filter(r=>{
-          if(!r.vaoo)return true;const d=new Date(r.vaoo);return d.getFullYear()<+y||(d.getFullYear()===+y&&d.getMonth()+1<=+m);
+          if(!r.vaoo)return true;
+          if(hasBillData(r.id,m,y))return true;
+          const d=new Date(r.vaoo);return d.getFullYear()<+y||(d.getFullYear()===+y&&d.getMonth()+1<=+m);
         }).forEach(r=>{hThu+=calcR(r,getMD(r.id,m,y),m,y).tong;});
-        hChi+=expenses.filter(e=>e.house===hx.id&&inRange(e.date)).reduce((s,e)=>s+(e.amount||0),0)/nMonths;
+        hChi+=expenses.filter(e=>e.house===hx.id&&e.cat!=='Trả Nợ Vay'&&inRange(e.date)).reduce((s,e)=>s+(e.amount||0),0)/nMonths;
         hChi+=allocForM(m,y,hx.id);
       });
       const hLN=hThu-hChi;
@@ -3444,7 +3611,9 @@ function exportStyledXLSX(fmP,fyP,tmP,tyP,doThu=true,doHD=true,doChi=true,doMerg
 
     function makeThuSheet(m,y){
       const list2=sortRooms((h?rooms.filter(r=>r.house===h):rooms).filter(r=>{
-        if(!r.vaoo)return true;const d=new Date(r.vaoo);
+        if(!r.vaoo)return true;
+        if(hasBillData(r.id,m,y))return true;
+        const d=new Date(r.vaoo);
         return d.getFullYear()<+y||(d.getFullYear()===+y&&d.getMonth()+1<=+m);
       }));
       const headers=['Nhà','Phòng','Số NL','Tiền Phòng','Trạng Thái','Mạng','VS','Giặt','TM',
@@ -3459,13 +3628,13 @@ function exportStyledXLSX(fmP,fyP,tmP,tyP,doThu=true,doHD=true,doChi=true,doMerg
         const md=getMD(r.id,m,y);const calc=calcR(r,md,m,y);
         const bg=i%2===0?'EFF4FF':'FFFFFF';const paid=md.paid;
         // SUM (không count) cho cột người
-        tNL+=r.nguoi||1;
+        tNL+=calc.nguoi||1;
         tPh+=calc.giaP;tMang+=calc.mang;tVS+=calc.vs;tGiat+=calc.giat;tTM+=calc.tm;
         tD+=calc.dTien;tkWh+=calc.kWh;tN+=calc.nTien;tM3+=calc.nuocM3||0;
         tAdj+=md.adj||0;tTong+=calc.tong;
         data.push([
           cv(hN(r.house),S(bg)),cv(r.room,S(bg,'212121',true,'center')),
-          cv(r.nguoi||1,S(bg,'','false','center')),
+          cv(calc.nguoi||1,S(bg,'','false','center')),
           cv(calc.giaP,NUMR(bg)),cv(paid?'✅ Đã thu':'⏳ Chưa thu',paid?GREEN:RED),
           cv(calc.mang,NUMR(bg)),cv(calc.vs,NUMR(bg)),cv(calc.giat,NUMR(bg)),cv(calc.tm,NUMR(bg)),
           cv(md.dienDau||0,NUMR(bg)),cv(md.dienCuoi||0,NUMR(bg)),
@@ -3530,7 +3699,9 @@ function exportStyledXLSX(fmP,fyP,tmP,tyP,doThu=true,doHD=true,doChi=true,doMerg
         let gtNL=0,gtPh=0,gtMang=0,gtVS=0,gtGiat=0,gtTM=0,gtD=0,gtkWh=0,gtN=0,gtM3=0,gtAdj=0,gtTong=0;
         monthList.forEach(({m:mm,y:yy})=>{
           const list2=sortRooms((h?rooms.filter(r=>r.house===h):rooms).filter(r=>{
-            if(!r.vaoo)return true;const d=new Date(r.vaoo);
+            if(!r.vaoo)return true;
+            if(hasBillData(r.id,mm,yy))return true;
+            const d=new Date(r.vaoo);
             return d.getFullYear()<+yy||(d.getFullYear()===+yy&&d.getMonth()+1<=+mm);
           }));
           // Header phân cách tháng
@@ -3539,11 +3710,11 @@ function exportStyledXLSX(fmP,fyP,tmP,tyP,doThu=true,doHD=true,doChi=true,doMerg
           list2.forEach((r,i)=>{
             const md=getMD(r.id,mm,yy);const calc=calcR(r,md,mm,yy);
             const bg=i%2===0?'EFF4FF':'FFFFFF';const paid=md.paid;
-            mNL+=r.nguoi||1;mPh+=calc.giaP;mMang+=calc.mang;mVS+=calc.vs;mGiat+=calc.giat;mTM+=calc.tm;
+            mNL+=calc.nguoi||1;mPh+=calc.giaP;mMang+=calc.mang;mVS+=calc.vs;mGiat+=calc.giat;mTM+=calc.tm;
             mD+=calc.dTien;mkWh+=calc.kWh;mN+=calc.nTien;mM3+=calc.nuocM3||0;mAdj+=md.adj||0;mTong+=calc.tong;
             dataM.push([
               cv(`T${mm}/${yy}`,S(bg,'666666')),cv(hN(r.house),S(bg)),cv(r.room,S(bg,'212121',true,'center')),
-              cv(r.nguoi||1,S(bg,'','','center')),cv(calc.giaP,NUMR(bg)),
+              cv(calc.nguoi||1,S(bg,'','','center')),cv(calc.giaP,NUMR(bg)),
               cv(paid?'✅ Đã thu':'⏳ Chưa',paid?GREEN:RED),
               cv(calc.mang,NUMR(bg)),cv(calc.vs,NUMR(bg)),cv(calc.giat,NUMR(bg)),cv(calc.tm,NUMR(bg)),
               cv(md.dienDau||0,NUMR(bg)),cv(md.dienCuoi||0,NUMR(bg)),
@@ -3654,7 +3825,7 @@ function exportXLSX(){
     const m=gM(),y=gY(),h=gH();const list=fRooms();const wb=XLSX.utils.book_new();
     let tPh=0,tD=0,tN=0,tTong=0;
     const rows1=list.map(r=>{const md=getMD(r.id,m,y);const c=calcR(r,md,m,y);tPh+=c.giaP;tD+=c.dTien;tN+=c.nTien;tTong+=c.tong;
-      return[hN(r.house),r.room,r.nguoi,c.giaP,md.paid?'Đã Thu':'Chưa Thu',c.mang,c.vs,c.giat,c.tm,md.dienDau||0,md.dienCuoi||0,c.dTieu,c.dTien,md.nuocDau||0,md.nuocCuoi||0,c.nTieu,c.nTien,c.adj||0,c.tong,md.note||''];
+      return[hN(r.house),r.room,c.nguoi,c.giaP,md.paid?'Đã Thu':'Chưa Thu',c.mang,c.vs,c.giat,c.tm,md.dienDau||0,md.dienCuoi||0,c.dTieu,c.dTien,md.nuocDau||0,md.nuocCuoi||0,c.nTieu,c.nTien,c.adj||0,c.tong,md.note||''];
     });
     XLSX.utils.book_append_sheet(wb,ws([[`BẢNG TÍNH TIỀN THÁNG ${m}/${y}${h?' — '+hN(h):''}`],['Nhà','Phòng','Người','Tiền Phòng','Trạng Thái','Mạng','VS','Giặt','TM','Đ Đầu','Đ Cuối','kWh','Tiền Điện','N Đầu','N Cuối','m³','Tiền Nước','±Adj','Tổng','Ghi Chú'],...rows1,['TỔNG','',list.length,tPh,'','','','','','','','',tD,'','','',tN,'',tTong,'']], [8,8,6,13,10,11,9,10,9,9,9,11,12,9,9,11,12,11,13,16]),`T${m}.${y}`);
     const allR=h?rooms.filter(r=>r.house===h):rooms;
@@ -3663,7 +3834,7 @@ function exportXLSX(){
     const allocL=h?allocExp.filter(ae=>ae.house===h):allocExp;
     XLSX.utils.book_append_sheet(wb,ws([[`CHI PHÍ T${m}/${y}${h?' — '+hN(h):''}`],['Loại','STT/Ngày','Nhà','Danh Mục/Mô Tả','Số Tiền','Ghi Chú'],...expL.map((e,i)=>['Thường',e.date,hN(e.house),e.cat+' — '+(e.desc||''),e.amount||0,e.note||'']),...allocL.map(ae=>{const pm=Math.round(ae.total/ae.months);const passed=(+y-+ae.fromY)*12+(+m-+ae.fromM);const active=passed>=0&&passed<ae.months;return['Phân bổ',`T${ae.fromM}/${ae.fromY}→${ae.months}th`,hN(ae.house),ae.desc,ae.total,''+pm+'/th'+(!active?' (không áp tháng này)':'')];}),['','','','TỔNG CHI THƯỜNG:',expL.reduce((s,e)=>s+(e.amount||0),0),''],['','','','PHÂN BỔ THÁNG NÀY:',allocForM(m,y,h||''),'']],[7,13,10,34,14,16]),'Chi Phí');
     XLSX.utils.book_append_sheet(wb,ws([[`TIỀN CỌC${h?' — '+hN(h):''}`],['Loại','Nhà','Phòng/Ghi Chú','Số Tiền','Ngày Đóng','Ngày HH','Trạng Thái'],...(h?deposits.filter(d=>d.house===h):deposits).map(d=>{const r=rooms.find(x=>x.id===d.roomId);return[d.type==='out'?'Mình cọc CN':'KH cọc mình',hN(d.house),d.type==='in'?(r?r.room+'—'+r.ten:'?'):d.note||'',d.amount,d.date||'',d.expire||'',d.returned?'✅ Đã hoàn/thu':'⏳ Đang giữ'];})],[8,10,20,13,12,12,14]),'Tiền Cọc');
-    XLSX.utils.book_append_sheet(wb,ws([['THÔNG TIN KHÁCH THUÊ'],['Nhà','Phòng','Khách Chính','CCCD','SĐT','Ngày Sinh','BSX','Địa Chỉ','Người 2','CCCD 2','SĐT 2','QH','BSX 2','Người 3','CCCD 3','BSX 3'],...allR.map(r=>[hN(r.house),r.room,r.ten||'',r.cccd||'',r.sdt||'',r.ns||'',r.bsx||'',r.dc||'',r.ten2||'',r.cccd2||'',r.sdt2||'',r.qh2||'',r.bsx2||'',r.ten3||'',r.cccd3||'',r.bsx3||''])],[8,8,18,14,12,11,11,25,18,14,12,10,11,18,14,11]),'Khách Thuê');
+    XLSX.utils.book_append_sheet(wb,ws([['THÔNG TIN KHÁCH THUÊ'],['Nhà','Phòng','Khách Chính','CCCD','SĐT','Ngày Sinh','BSX','Địa Chỉ','Người 2','CCCD 2','SĐT 2','QH','BSX 2','Người 3','CCCD 3','BSX 3','Người 4','CCCD 4','BSX 4'],...allR.map(r=>[hN(r.house),r.room,r.ten||'',r.cccd||'',r.sdt||'',r.ns||'',r.bsx||'',r.dc||'',r.ten2||'',r.cccd2||'',r.sdt2||'',r.qh2||'',r.bsx2||'',r.ten3||'',r.cccd3||'',r.bsx3||'',r.ten4||'',r.cccd4||'',r.bsx4||''])],[8,8,18,14,12,11,11,25,18,14,12,10,11,18,14,11,18,14,11]),'Khách Thuê');
     XLSX.writeFile(wb,`NhaTro_T${m}_${y}${h?'_'+hN(h).replace(/\s/g,''):''}.xlsx`);
     toast('✅ Xuất XLSX thành công!','success');
   }catch(ex){toast('Lỗi: '+ex.message,'error');console.error(ex);}
@@ -3690,6 +3861,7 @@ loadData();
 loadLoanEntries();
 loadRepaidEntries();
 loadPriceHistory();
+normalizeDates();
 loadLastMY();
 rebuildSels();
 fillRSels();
