@@ -734,7 +734,7 @@ td input:disabled{opacity:.45;cursor:not-allowed;background:var(--bg4)}
         <div class="fg"><label class="fl">Tên Phòng *</label><input class="fi" id="rRoom" placeholder="P101"></div>
         <div class="fg"><label class="fl">Số Người</label><input class="fi" type="number" id="rNguoi" value="1" min="1" onchange="onRNguoiChange()"></div>
         <div class="fg" id="rNguoiFromWrap" style="display:none"><label class="fl">Áp dụng <span id="rNguoiFromLbl"></span> từ ngày</label><input class="fi" type="date" id="rNguoiFrom"></div>
-        <div class="fg"><label class="fl">Tiền Phòng (đ)</label><input class="fi" type="number" id="rGia" value="3500000"></div>
+        <div class="fg"><label class="fl">Tiền Phòng (đ)</label><input class="fi" type="number" id="rGia" value="3500000" onchange="onRNguoiChange()"></div>
         <div class="fg"><label class="fl">Ngày Vào Ở</label><input class="fi" type="date" id="rVaoo"></div>
         <div class="fg"><label class="fl">Ngày Ký HĐ</label><input class="fi" type="date" id="rHdky"></div>
         <div class="fg"><label class="fl">Ngày HH HĐ</label><input class="fi" type="date" id="rHd"></div>
@@ -861,6 +861,15 @@ const FB_CFG = {
 const FB = FB_CFG.databaseURL + '/nhatro';
 let fbOk=false, lastHash='', saveT=null, pollT=null;
 
+// Áp dụng lịch sử giá từ Firebase/backup (theo từng phòng, bản từ nguồn ngoài được ưu tiên)
+function applyRemotePH(d){
+  if(!d||!d.priceHistory||typeof d.priceHistory!=='object')return false;
+  const keys=Object.keys(d.priceHistory);
+  if(!keys.length)return false;
+  keys.forEach(rid=>{const l=d.priceHistory[rid];if(Array.isArray(l)&&l.length)priceHistory[rid]=l;});
+  try{localStorage.setItem('nt10_priceHistory',JSON.stringify(priceHistory));}catch(e){}
+  return true;
+}
 async function initFB(){
   try{
     setSyncUI('connecting');
@@ -879,10 +888,13 @@ async function initFB(){
       if(d.deposits&&d.deposits.length)deposits=d.deposits;
       if(d.locked)locked=d.locked;
     if(d.tenantHistory)tenantHistory=d.tenantHistory;
+      const gotPH=applyRemotePH(d);
       lastHash=JSON.stringify(d);
       rebuildSels();
       refresh('thu');
       toast('☁️ Đã tải data từ Firebase!','success');
+      // Firebase chưa có lịch sử giá mà máy này có → đẩy lên để các link khác dùng chung
+      if(!gotPH&&Object.keys(priceHistory||{}).length)setTimeout(saveData,300);
     }
     fbOk=true;setSyncUI('online');
     // Auto-poll tắt — chỉ sync khi bấm nút Sync thủ công
@@ -917,6 +929,7 @@ async function doPoll(){
     if(d.deposits&&d.deposits.length>=deposits.length)deposits=d.deposits;
     if(d.locked)locked=d.locked;
     if(d.tenantHistory)tenantHistory=d.tenantHistory;
+    applyRemotePH(d);
     rebuildSels();
     // Không re-render tab đang nhập liệu
     if(activeTab!=='chiphi'&&activeTab!=='thu')refresh(activeTab);
@@ -925,13 +938,13 @@ async function doPoll(){
   }catch(e){setSyncUI('offline');}
 }
 function saveData(){
-  const keys=['houses','rooms','expenses','settings','houseSettings','monthlyData','allocExp','deposits','locked','tenantHistory'];
+  const keys=['houses','rooms','expenses','settings','houseSettings','monthlyData','allocExp','deposits','locked','tenantHistory','priceHistory'];
   keys.forEach(k=>{try{localStorage.setItem('nt10_'+k,JSON.stringify(eval(k)));}catch(e){}});
   if(!fbOk)return;
   clearTimeout(saveT);
   saveT=setTimeout(async()=>{
     try{
-      const p={houses,rooms,expenses,settings,houseSettings,monthlyData,allocExp,deposits,locked,tenantHistory};
+      const p={houses,rooms,expenses,settings,houseSettings,monthlyData,allocExp,deposits,locked,tenantHistory,priceHistory};
       const r=await fetch(FB+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(p)});
       if(r.ok){setSyncUI('online');lastHash=JSON.stringify(p);}
       else setSyncUI('offline');
@@ -941,7 +954,7 @@ function saveData(){
 function loadData(){
   try{
     // Luôn load nt10_* trước
-    ['houses','rooms','expenses','settings','houseSettings','monthlyData','allocExp','deposits','locked','tenantHistory']
+    ['houses','rooms','expenses','settings','houseSettings','monthlyData','allocExp','deposits','locked','tenantHistory','priceHistory']
       .forEach(k=>{const v=localStorage.getItem('nt10_'+k);if(v)eval(k+'=JSON.parse(v)');});
     const q=localStorage.getItem('nt10_qr')||localStorage.getItem('v5_qr');if(q)qrUrl=q;
 
@@ -995,6 +1008,7 @@ async function forceLoadFB(){
     if(d.deposits&&d.deposits.length)deposits=d.deposits;
     if(d.locked)locked=d.locked;
     if(d.tenantHistory)tenantHistory=d.tenantHistory;
+    applyRemotePH(d);
     lastHash=JSON.stringify(d);
     fbOk=true;setSyncUI('online');
     rebuildSels();refresh('thu');
@@ -1609,7 +1623,7 @@ function renderHouses(){
 function switchRTab(n){
   [1,2].forEach(i=>{document.getElementById('rmc'+i).style.display=i===n?'block':'none';document.getElementById('rmt'+i).classList.toggle('active',i===n);});
 }
-let _origNguoi=1;
+let _origNguoi=1,_origGia=0;
 function openRoomModal(){
   editRid=null;rebuildSels();
   ['rRoom','rTen','rCccd','rSdt','rNs','rBsx','rDc','rVaoo','rHdky','rHd','rZalo','rNote','rTen2','rCccd2','rSdt2','rQh2','rBsx2','rVaoo2','rTen3','rCccd3','rBsx3','rVaoo3','rTen4','rCccd4','rBsx4','rVaoo4'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
@@ -1622,7 +1636,7 @@ function openEditRoom(id){
   editRid=id;rebuildSels();
   const mp={house:'rHouse',room:'rRoom',nguoi:'rNguoi',gia:'rGia',vaoo:'rVaoo',hdky:'rHdky',hd:'rHd',coc:'rCoc',zalo:'rZalo',note:'rNote',ten:'rTen',cccd:'rCccd',sdt:'rSdt',ns:'rNs',bsx:'rBsx',dc:'rDc',ten2:'rTen2',cccd2:'rCccd2',sdt2:'rSdt2',qh2:'rQh2',bsx2:'rBsx2',vaoo2:'rVaoo2',ten3:'rTen3',cccd3:'rCccd3',bsx3:'rBsx3',vaoo3:'rVaoo3',ten4:'rTen4',cccd4:'rCccd4',bsx4:'rBsx4',vaoo4:'rVaoo4'};
   for(const[rk,mk]of Object.entries(mp)){const e=document.getElementById(mk);if(e)e.value=r[rk]||'';}
-  _origNguoi=r.nguoi||1;document.getElementById('rNguoiFromWrap').style.display='none';document.getElementById('rNguoiFrom').value=new Date().toISOString().slice(0,10);
+  _origNguoi=r.nguoi||1;_origGia=r.gia||0;document.getElementById('rNguoiFromWrap').style.display='none';document.getElementById('rNguoiFrom').value=new Date().toISOString().slice(0,10);
   clearCC();loadCC(r);switchRTab(1);document.getElementById('moRoom').classList.add('show');
 }
 function onRNguoiChange(){
@@ -1631,8 +1645,9 @@ function onRNguoiChange(){
   const newV=+document.getElementById('rNguoi').value||1;
   const wrap=document.getElementById('rNguoiFromWrap');
   const lbl=document.getElementById('rNguoiFromLbl');
-  if(editRid&&newV!==_origNguoi){
-    lbl.textContent=newV>_origNguoi?`+${newV-_origNguoi} người mới (${newV} người)`:`giảm còn ${newV} người`;
+  const newG=+document.getElementById('rGia').value||0;
+  if(editRid&&(newV!==_origNguoi||newG!==_origGia)){
+    lbl.textContent=newV>_origNguoi?`+${newV-_origNguoi} người mới (${newV} người)`:newV<_origNguoi?`giảm còn ${newV} người`:`giá ${newG.toLocaleString('vi-VN')}đ`;
     wrap.style.display='block';
     if(!document.getElementById('rNguoiFrom').value)document.getElementById('rNguoiFrom').value=new Date().toISOString().slice(0,10);
   }else{
@@ -1668,7 +1683,7 @@ function saveRoom(){
   const data={house:hid,room:nm,nguoi:newNguoi,gia:+document.getElementById('rGia').value||0,vaoo:document.getElementById('rVaoo').value,hdky:document.getElementById('rHdky').value,hd:document.getElementById('rHd').value,coc,zalo:document.getElementById('rZalo').value,note:document.getElementById('rNote').value,ten:document.getElementById('rTen').value,cccd:document.getElementById('rCccd').value,sdt:document.getElementById('rSdt').value,ns:document.getElementById('rNs').value,bsx:document.getElementById('rBsx').value,dc:document.getElementById('rDc').value,ten2:document.getElementById('rTen2').value,cccd2:document.getElementById('rCccd2').value,sdt2:document.getElementById('rSdt2').value,qh2:document.getElementById('rQh2').value,bsx2:document.getElementById('rBsx2').value,vaoo2:document.getElementById('rVaoo2').value,ten3:document.getElementById('rTen3').value,cccd3:document.getElementById('rCccd3').value,bsx3:document.getElementById('rBsx3').value,vaoo3:document.getElementById('rVaoo3').value,ten4:document.getElementById('rTen4').value,cccd4:document.getElementById('rCccd4').value,bsx4:document.getElementById('rBsx4').value,vaoo4:document.getElementById('rVaoo4').value,c1f:document.getElementById('v-c1f').value,c1b:document.getElementById('v-c1b').value,c2f:document.getElementById('v-c2f').value,c2b:document.getElementById('v-c2b').value};
   // Nếu đang sửa phòng có sẵn và số người thay đổi → ghi vào Lịch Sử với ngày hiệu lực,
   // để các tháng TRƯỚC ngày đó vẫn tính đúng số người cũ (không bị ảnh hưởng tiền thu đã tính).
-  if(editRid&&newNguoi!==_origNguoi){
+  if(editRid&&(newNguoi!==_origNguoi||data.gia!==_origGia)){
     const oldRoom=rooms.find(x=>x.id===editRid);
     const fromDate=document.getElementById('rNguoiFrom').value||new Date().toISOString().slice(0,10);
     if(!priceHistory[editRid])priceHistory[editRid]=[];
@@ -1678,7 +1693,7 @@ function saveRoom(){
       const baseDate=(oldRoom?.vaoo&&oldRoom.vaoo<fromDate)?oldRoom.vaoo:'2000-01-01';
       priceHistory[editRid].push({from:baseDate,gia:oldRoom?.gia||0,nguoi:_origNguoi,note:'Mốc gốc (trước khi điều chỉnh)'});
     }
-    priceHistory[editRid].push({from:fromDate,gia:data.gia,nguoi:newNguoi,note:newNguoi>_origNguoi?`Thêm người ở (${_origNguoi}→${newNguoi})`:`Bớt người ở (${_origNguoi}→${newNguoi})`});
+    priceHistory[editRid].push({from:fromDate,gia:data.gia,nguoi:newNguoi,note:newNguoi>_origNguoi?`Thêm người ở (${_origNguoi}→${newNguoi})`:newNguoi<_origNguoi?`Bớt người ở (${_origNguoi}→${newNguoi})`:`Đổi giá phòng (${_origGia}→${data.gia})`});
     savePriceHistory();
   }
   if(editRid){
@@ -2407,6 +2422,7 @@ function loadPriceHistory(){
 }
 function savePriceHistory(){
   localStorage.setItem('nt10_priceHistory',JSON.stringify(priceHistory));
+  if(typeof saveData==='function')saveData();
 }
 function getPriceAt(rid, dateStr){
   // Lấy giá hiệu lực tại ngày dateStr
@@ -2627,6 +2643,11 @@ function savePriceHist(rid){
   const note=document.getElementById('phNote')?.value||'';
   if(!from||!gia){toast('Nhập đầy đủ ngày và giá!','error');return;}
   if(!priceHistory[rid])priceHistory[rid]=[];
+  if(!priceHistory[rid].length){
+    const _r=rooms.find(x=>x.id===rid);
+    if(_r){const _bd=(_r.vaoo&&_r.vaoo<from)?_r.vaoo:'2000-01-01';
+      priceHistory[rid].push({from:_bd,gia:_r.gia||0,nguoi:_r.nguoi||1,note:'Mốc gốc (trước khi điều chỉnh)'});}
+  }
   priceHistory[rid].push({from,gia,nguoi,note});
   savePriceHistory();
   toast('✅ Đã lưu mốc giá!','success');
@@ -2640,6 +2661,11 @@ function applyPriceToRoom(rid){
   const note=document.getElementById('phNote')?.value||'';
   if(!from||!gia){toast('Nhập đầy đủ ngày và giá!','error');return;}
   if(!priceHistory[rid])priceHistory[rid]=[];
+  if(!priceHistory[rid].length){
+    const _r=rooms.find(x=>x.id===rid);
+    if(_r){const _bd=(_r.vaoo&&_r.vaoo<from)?_r.vaoo:'2000-01-01';
+      priceHistory[rid].push({from:_bd,gia:_r.gia||0,nguoi:_r.nguoi||1,note:'Mốc gốc (trước khi điều chỉnh)'});}
+  }
   priceHistory[rid].push({from,gia,nguoi,note});
   savePriceHistory();
   // Áp dụng giá mới vào phòng
@@ -3394,7 +3420,7 @@ function exportData(){
     _version:'v10',
     _exported:new Date().toISOString(),
     houses,rooms,expenses,settings,houseSettings,
-    monthlyData,allocExp,deposits,locked
+    monthlyData,allocExp,deposits,locked,tenantHistory,priceHistory
   };
   const json=JSON.stringify(data,null,2);
   const blob=new Blob([json],{type:'application/json'});
@@ -3426,6 +3452,7 @@ function importData(input){
       if(d.deposits&&d.deposits.length)deposits=d.deposits;
       if(d.locked)locked=d.locked;
     if(d.tenantHistory)tenantHistory=d.tenantHistory;
+      applyRemotePH(d);
       saveData();
       rebuildSels();
       refresh('thu');
